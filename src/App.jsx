@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useRef } from "react";
+import axios from "axios";
+import "./App.css";
+import WeatherInformations from "./components/WeatherInformations/WeatherInformations";
+import WeatherInformations5Days from "./components/WeatherInformations5Days/WeatherInformations5Days";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [weather, setWeather] = useState();
+  const [weather5Days, setWeather5Days] = useState();
+  const inputRef = useRef();
+  async function searchCity() {
+    const city = inputRef.current.value;
+    const key = "0f3b46ddeb3fb5597221ec8293f713a7";
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}&lang=pt_br&units=metric`;
+    const url5Days = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${key}&lang=pt_br&units=metric`;
+    const apiInfo = await axios.get(url);
+    const apiInfo5Days = await axios.get(url5Days);
 
+
+    setWeather5Days(apiInfo5Days.data);
+    setWeather(apiInfo.data);
+
+
+  }
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="container">
+      <h1>Nick's Previsão do Tempo</h1>
+      <input ref={inputRef} type="text" placeholder="Digite o nome da cidade" />
+      <button onClick={searchCity}>Buscar</button>
+      {weather && <WeatherInformations weather={weather}/>}
+      {weather5Days && <WeatherInformations5Days weather5Days={weather5Days}/>}
+
+    </div>
+  );
 }
 
-export default App
+export default App;
